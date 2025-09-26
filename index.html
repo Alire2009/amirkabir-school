@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>دبیرستان امیرکبیر</title>
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      margin: 0;
+      direction: rtl;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header {
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+      font-size: 22px;
+      backdrop-filter: blur(10px);
+    }
+    nav.menu {
+      background: rgba(0,0,0,0.5);
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      backdrop-filter: blur(8px);
+    }
+    nav.menu button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 8px;
+      background: #1976d2;
+      color: #fff;
+      cursor: pointer;
+      transition: .2s;
+    }
+    nav.menu button:hover { background: #125a9c; }
+    nav.menu button.active { background: #0d3d73; }
+    main { padding: 20px; }
+    section { display: none; }
+    .card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    input, textarea, select, button {
+      margin: 5px 0;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+    }
+    input, textarea, select {
+      width: 250px;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+    input::placeholder, textarea::placeholder { color: #ccc; }
+    button { background: #1976d2; color: #fff; border: none; }
+    button:hover { background: #0d3d73; }
+    .small { font-size: 13px; color: #ccc; }
+    #galleryGrid img {
+      width: 120px; height: 90px; object-fit: cover; margin: 5px;
+      border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    }
+    #chatWall {
+      max-height: 250px; overflow-y: auto; background: rgba(255,255,255,0.1);
+      padding: 10px; border-radius: 8px;
+    }
+
+    /* مرکز صفحه ورود */
+    #loginArea {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.6);
+      padding: 30px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+    }
+    #loginArea h3 { margin-bottom: 20px; }
+    #loginArea input { width: 220px; display:block; margin:10px auto; }
+  </style>
+</head>
+<body>
+  <div id="loginArea">
+    <h3>ورود به سامانه دبیرستان امیرکبیر</h3>
+    <input id="username" placeholder="نام کاربری">
+    <input id="password" type="password" placeholder="رمز عبور">
+    <button onclick="login()">ورود</button>
+  </div>
+
+  <div id="app" style="display:none;">
+    <header>سامانه دبیرستان امیرکبیر</header>
+    <nav class="menu">
+      <button id="m-dashboard" onclick="show('dashboard')">داشبورد</button>
+      <button id="m-news" onclick="show('news')">اخبار</button>
+      <button id="m-gallery" onclick="show('gallery')">گالری</button>
+      <button id="m-survey" onclick="show('survey')">نظرسنجی</button>
+      <button id="m-reports" onclick="show('reports')">کارنامه</button>
+      <button id="m-attendance" onclick="show('attendance')">حضور و غیاب</button>
+      <button id="m-users" onclick="show('users')">مدیریت کاربران</button>
+      <button id="m-chat" onclick="show('chat')">پیام‌ها</button>
+      <button onclick="logout()">خروج</button>
+    </nav>
+    <div style="padding:10px; background:rgba(0,0,0,0.4);">وضعیت: <span id="userBar">ورود نشده</span></div>
+    <main>
+      <section id="dashboard" style="display:block;">
+        <h2 id="welcome">خوش آمدید</h2>
+        <div class="card"><b>آخرین خبر:</b> <span id="dashNews"></span></div>
+        <div class="card"><b>گالری:</b> <span id="dashGallery"></span></div>
+      </section>
+      <section id="news"><h2>اخبار</h2><input id="newsTitle" placeholder="عنوان خبر"><br><textarea id="newsBody" placeholder="متن خبر"></textarea><br><button onclick="addNews()">افزودن</button><div id="newsList"></div></section>
+      <section id="gallery"><h2>گالری</h2><input id="galleryUrl" placeholder="آدرس تصویر"><br><button onclick="addImage()">افزودن</button><div id="galleryGrid"></div></section>
+      <section id="survey"><h2>نظرسنجی</h2><input id="surveyQ" placeholder="سوال"><br><button onclick="createSurvey()">ایجاد</button><div id="surveyArea"></div></section>
+      <section id="reports"><h2>کارنامه</h2><input id="stuName" placeholder="نام دانش‌آموز"><br><input id="stuScore" placeholder="نمره"><br><button onclick="addReport()">ثبت</button><div id="reportTable"></div></section>
+      <section id="attendance"><h2>حضور و غیاب</h2><input id="attName" placeholder="نام دانش‌آموز"><br><select id="attStatus"><option>حاضر</option><option>غایب</option><option>تاخیر</option></select><br><button onclick="markAttendance()">ثبت</button><div id="attTable"></div></section>
+      <section id="users"><h2>مدیریت کاربران</h2><input id="newUser" placeholder="نام کاربری"><input id="newPass" placeholder="رمز عبور"><select id="newRole"><option value="student">دانش‌آموز</option><option value="teacher">معلم</option><option value="vp">معاون</option><option value="admin">مدیر</option></select><button onclick="addUser()">افزودن</button><div id="userList"></div></section>
+      <section id="chat"><h2>پیام‌ها</h2><input id="chatMsg" placeholder="پیام"><button onclick="sendMsg()">ارسال</button><div id="chatWall"></div></section>
+    </main>
+  </div>
+
+<script>
+/* همون کد جاوااسکریپت مدیریت ورود و امکانات که قبل برات نوشتم */
+const STORAGE_KEY = 'amirkabir_v4';
+const SAMPLE_USERS = {
+  admin:{password:'1234',role:'admin',name:'مدیر'},
+  vp:{password:'2222',role:'vp',name:'معاون'},
+  teacher1:{password:'1111',role:'teacher',name:'استاد احمدی'},
+  student1:{password:'0000',role:'student',name:'علی'}
+};
+const DEFAULT_DATA = {users:SAMPLE_USERS,news:[],gallery:[],survey:null,reports:{},attendance:{},chat:[]};
+let state={},currentUser=null;
+function loadState(){try{state=JSON.parse(localStorage.getItem(STORAGE_KEY))||DEFAULT_DATA}catch(e){state=DEFAULT_DATA}}
+function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+function getById(i){return document.getElementById(i)}
+function login(){const u=getById('username').value,p=getById('password').value;if(state.users[u]&&state.users[u].password===p){currentUser={username:u,role:state.users[u].role,name:state.users[u].name};getById('loginArea').style.display='none';getById('app').style.display='block';getById('userBar').textContent=`${currentUser.name} — ${currentUser.role}`;if(currentUser.role!=='admin')getById('m-users').style.display='none';renderAll();show('dashboard')}else alert('نام کاربری یا رمز اشتباه')}
+function logout(){currentUser=null;getById('loginArea').style.display='block';getById('app').style.display='none';}
+function show(id){document.querySelectorAll('main section').forEach(s=>s.style.display='none');document.querySelectorAll('.menu button').forEach(b=>b.classList.remove('active'));getById(id).style.display='block';const btn=getById('m-'+id);if(btn)btn.classList.add('active');renderAll();}
+function addNews(){const t=getById('newsTitle').value,b=getById('newsBody').value;if(!t||!b)return;state.news.unshift({title:t,body:b,date:new Date().toLocaleString(),author:currentUser.username});saveState();getById('newsTitle').value='';getById('newsBody').value='';renderNews()}
+function renderNews(){const c=getById('newsList');c.innerHTML=state.news.length?state.news.map(n=>`<div class="card"><b>${n.title}</b><div class="small">${n.date} - ${n.author}</div><div>${n.body}</div></div>`).join(''):'هیچ خبری نیست'}
+function addImage(){const url=getById('galleryUrl').value;if(!url)return;state.gallery.unshift(url);saveState();getById('galleryUrl').value='';renderGallery()}
+function renderGallery(){getById('galleryGrid').innerHTML=state.gallery.length?state.gallery.map(s=>`<img src="${s}">`).join(''):'گالری خالی است'}
+function createSurvey(){const q=getById('surveyQ').value;if(!q)return;state.survey={q,options:['بله','خیر'],votes:[0,0]};saveState();getById('surveyQ').value='';renderSurvey()}
+function voteSurvey(i){state.survey.votes[i]++;saveState();renderSurvey()}
+function renderSurvey(){const a=getById('surveyArea');if(!state.survey){a.innerHTML='هیچ نظرسنجی نیست';return;}const s=state.survey;a.innerHTML=`<b>${s.q}</b><br><button onclick="voteSurvey(0)">بله</button> ${s.votes[0]} رای<br><button onclick="voteSurvey(1)">خیر</button> ${s.votes[1]} رای`}
+function addReport(){const n=getById('stuName').value,sc=Number(getById('stuScore').value);if(!n||isNaN(sc))return;if(!state.reports[n])state.reports[n]=[];state.reports[n].push({term:new Date().toLocaleDateString(),score:sc});saveState();getById('stuName').value='';getById('stuScore').value='';renderReports()}
+function renderReports(){const t=getById('reportTable');t.innerHTML='';for(const s in state.reports){t.innerHTML+=`<div class="card"><b>${s}</b><div>${state.reports[s].map(r=>`${r.term}: ${r.score}`).join('<br>')}</div></div>`}}
+function markAttendance(){const n=getById('attName').value,st=getById('attStatus').value;if(!n)return;if(!state.attendance[n])state.attendance[n]=[];state.attendance[n].push({date:new Date().toLocaleString(),status:st});saveState();getById('attName').value='';renderAttendance()}
+function renderAttendance(){const t=getById('attTable');t.innerHTML='';for(const s in state.attendance){t.innerHTML+=`<div class="card"><b>${s}</b><div>${state.attendance[s].map(a=>`${a.date}: ${a.status}`).join('<br>')}</div></div>`}}
+function addUser(){const u=getById('newUser').value,p=getById('newPass').value,r=getById('newRole').value;if(!u||!p)return;state.users[u]={password:p,role:r,name:u};saveState();getById('newUser').value='';getById('newPass').value='';renderUsers()}
+function renderUsers(){getById('userList').innerHTML=Object.keys(state.users).map(u=>`${u} - ${state.users[u].role}`).join('<br>')}
+function sendMsg(){const m=getById('chatMsg').value;if(!m)return;state.chat.push({user:currentUser.username,text:m,date:new Date().toLocaleString()});saveState();getById('chatMsg').value='';renderChat()}
+function renderChat(){getById('chatWall').innerHTML=state.chat.map(c=>`<div><b>${c.user}</b>: ${c.text} <span class="small">(${c.date})</span></div>`).join('')}
+function refreshDashboard(){getById('welcome').textContent=`خوش آمدی ${currentUser.name}`;getById('dashNews').textContent=state.news[0]?state.news[0].title:'بدون خبر';getById('dashGallery').textContent=state.gallery.length?state.gallery.length+' تصویر':'بدون تصویر'}
+function renderAll(){renderNews();renderGallery();renderSurvey();renderReports();renderAttendance();renderUsers();renderChat();refreshDashboard()}
+window.onload=()=>{loadState();renderAll()}
+</script>
+</body>
+</html>
